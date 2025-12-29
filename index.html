@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>ESP32 - Monitor de Motor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0f172a;
+      color: #e5e7eb;
+      text-align: center;
+      padding: 30px;
+    }
+
+    h1 {
+      color: #38bdf8;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      margin: auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+
+    .dato {
+      font-size: 1.4em;
+      margin: 10px 0;
+    }
+
+    .alarma {
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .on {
+      background: #dc2626;
+      color: white;
+    }
+
+    .off {
+      background: #16a34a;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>ESP32 - Monitor de Motor</h1>
+
+  <div class="card">
+    <div class="dato">AX: <span id="ax">0</span></div>
+    <div class="dato">AY: <span id="ay">0</span></div>
+    <div class="dato">AZ: <span id="az">0</span></div>
+    <div class="dato">Vibración: <span id="vib">0</span> m/s²</div>
+    <div id="estado" class="alarma off">APAGADA</div>
+  </div>
+
+<script>
+const ESP32_IP = ""; 
+// 👉 si el HTML está DENTRO del ESP32 deja vacío ""
+// 👉 si está en GitHub Pages pon: "http://IP_DEL_ESP32"
+
+function actualizarDatos() {
+  fetch(ESP32_IP = "192.168.100.149")
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById("ax").textContent = data.ax.toFixed(2);
+      document.getElementById("ay").textContent = data.ay.toFixed(2);
+      document.getElementById("az").textContent = data.az.toFixed(2);
+      document.getElementById("vib").textContent = data.vib.toFixed(2);
+
+      const estado = document.getElementById("estado");
+
+      if (data.estado === "ALARMA") {
+        estado.textContent = "ALARMA";
+        estado.className = "alarma on";
+      } else {
+        estado.textContent = "NORMAL";
+        estado.className = "alarma off";
+      }
+    })
+    .catch(err => console.error("Error:", err));
+}
+
+// actualizar cada 500 ms
+setInterval(actualizarDatos, 500);
+</script>
+
+</body>
+</html>
